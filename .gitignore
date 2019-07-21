@@ -13,6 +13,9 @@ vendor
 ## VI
 *.swp
 
+## VSCode
+.vscode
+
 # storage
 storage
 
