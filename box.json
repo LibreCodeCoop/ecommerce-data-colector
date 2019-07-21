@@ -1,0 +1,21 @@
+{
+    "output": "coleta-dados.phar",
+    "chmod": "0755",
+    "files": [
+        "LICENSE",
+        "vendor/autoload.php"
+    ],
+    "finder": [
+        {
+            "name": ["*.php"],
+            "exclude": ["tests"],
+            "in": [
+                "src",
+                "vendor"
+            ]
+        }
+    ],
+    "main": "bin/coleta-dados.php",
+    "stub": true,
+    "web": false
+}
