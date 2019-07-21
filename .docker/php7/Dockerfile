@@ -13,7 +13,7 @@ RUN docker-php-ext-install -j "$(nproc)" \
         zip \
         gd
 
-RUN pecl install xdebug-2.7.0RC2 \
+RUN pecl install xdebug-2.8.0alpha1 \
     && docker-php-ext-enable xdebug
 
 COPY config/php.ini /usr/local/etc/php/conf.d/
