@@ -44,7 +44,8 @@
 		"test" : [
 			"@unit",
 			"@phpcs",
-			"@phplint"
+			"@phplint",
+			"@phpstan"
 		]
 	},
 	"bin" : [

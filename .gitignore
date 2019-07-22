@@ -22,4 +22,10 @@ storage
 # settings
 .env
 
+# this is the code coverage generated when running phpunit.
+tests/log
+
+# Cache
+.phplint-cache
+
 *.csv
