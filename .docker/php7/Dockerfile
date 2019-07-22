@@ -5,13 +5,9 @@ RUN apt-get update
 RUN apt-get install -y \
         git \
         libpq-dev \
-        libzip-dev \
-		libjpeg-dev \
-		libpng-dev
-RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr;
+        libzip-dev
 RUN docker-php-ext-install -j "$(nproc)" \
-        zip \
-        gd
+        zip
 
 RUN pecl install xdebug-2.8.0alpha1 \
     && docker-php-ext-enable xdebug
