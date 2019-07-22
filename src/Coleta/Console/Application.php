@@ -23,7 +23,7 @@ class Application extends BaseApplication
 
         parent::doRun($input, $output);
     }
-    
+
     public function getHelp()
     {
         return <<<HELP
@@ -32,7 +32,7 @@ class Application extends BaseApplication
             Coleta de dados de site de e-commerce.
             HELP;
     }
-    
+
     /**
      * Initializes all commands.
      */

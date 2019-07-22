@@ -43,7 +43,7 @@ class ColetaCommand extends Command
         }
         try {
             $url = $input->getOption('url');
-            if(!filter_var($url, FILTER_VALIDATE_URL)) {
+            if (!filter_var($url, FILTER_VALIDATE_URL)) {
                 throw new \Exception(
                     '<error>URL inválida</error>'
                 );
