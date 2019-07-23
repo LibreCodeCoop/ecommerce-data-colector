@@ -46,7 +46,7 @@
 		"unit-html" : "php -d phar.readonly=0 vendor/bin/phpunit --coverage-html ./tests/log/ --colors=always",
 		"phpstan" : "vendor/bin/phpstan analyse src --level 7",
 		"test" : [
-			"@unit-html",
+			"@unit",
 			"@phpcs",
 			"@phplint",
 			"@phpstan"
