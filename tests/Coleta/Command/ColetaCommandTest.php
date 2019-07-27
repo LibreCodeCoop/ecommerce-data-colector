@@ -1,39 +1,20 @@
 <?php
-use PHPUnit\Framework\TestCase;
 use ColetaDados\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Lock\Store\FlockStore;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Goutte\Client;
+use Tests\TestCase;
 
 class ColetaCommandTest extends TestCase
 {
-    /** @var MockHandler */
-    protected $mock;
     /**
      * @var Client
      */
     private $command;
     
-    protected function getGuzzle(array $responses = [], array $extraConfig = [])
-    {
-        if (empty($responses)) {
-            $responses = [new GuzzleResponse(200, [], '<html><body><p>Hi</p></body></html>')];
-        }
-        $this->mock = new MockHandler($responses);
-        $handlerStack = HandlerStack::create($this->mock);
-        $this->history = [];
-        $handlerStack->push(Middleware::history($this->history));
-        $guzzle = new GuzzleClient(array_merge(array('redirect.disable' => true, 'base_uri' => '', 'handler' => $handlerStack), $extraConfig));
-        
-        return $guzzle;
-    }
 
     public function setUp()
     {
@@ -92,7 +73,6 @@ class ColetaCommandTest extends TestCase
             HTML;
         $this->command->getLoja()->client->setClient($this->getGuzzle([
             new GuzzleResponse(200, [], $html),
-            new GuzzleResponse(200, [], $html)
         ]));
         $this->tester = new CommandTester($this->command);
         $this->tester->execute([
@@ -111,7 +91,6 @@ class ColetaCommandTest extends TestCase
             HTML;
         $this->command->getLoja()->client->setClient($this->getGuzzle([
             new GuzzleResponse(200, [], $html),
-            new GuzzleResponse(200, [], $html)
         ]));
         $this->tester = new CommandTester($this->command);
         $this->tester->execute([

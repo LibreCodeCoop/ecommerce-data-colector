@@ -1,7 +1,7 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use ColetaDados\Scrappers\Lojas;
+use Tests\TestCase;
 
 class LojasTest extends TestCase
 {

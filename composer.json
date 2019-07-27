@@ -20,7 +20,8 @@
     "minimum-stability": "dev",
 	"autoload" : {
 		"psr-4" : {
-			"ColetaDados\\" : "src/Coleta"
+			"ColetaDados\\" : "src/Coleta",
+			"Tests\\" : "tests/"
 		}
 	},
 	"require" : {

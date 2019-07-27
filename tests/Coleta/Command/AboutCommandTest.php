@@ -1,7 +1,7 @@
 <?php
-use PHPUnit\Framework\TestCase;
 use ColetaDados\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Tests\TestCase;
 
 class AboutCommandTest extends TestCase
 {

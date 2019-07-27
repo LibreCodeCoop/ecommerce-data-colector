@@ -1,6 +1,6 @@
 <?php
-use PHPUnit\Framework\TestCase;
 use ColetaDados\Console\Application;
+use Tests\TestCase;
 
 class ApplicationTest extends TestCase
 {
