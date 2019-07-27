@@ -89,7 +89,7 @@ class ColetaCommand extends Command
                 'Informe as lojas desejadas, ENTER para selecionar todas, CTRL+C para cancelar',
                 array_map(
                     function ($loja) {
-                        return str_replace(' ', '-', $loja);
+                        return str_replace(' ', '-', $loja['nome']);
                     },
                     $lista
                 ),
@@ -100,13 +100,13 @@ class ColetaCommand extends Command
             $realPositions = array_intersect(
                 array_map(
                     function ($loja) {
-                        return str_replace(' ', '-', $loja);
+                        return str_replace(' ', '-', $loja['nome']);
                     },
-                    array_keys($lista)
+                    $lista
                 ),
                 $positionsResponses
             );
-            $lojas = array_intersect_key(array_keys($lista), $realPositions);
+            $lojas = array_keys($realPositions);
         } else {
             foreach ($lojas as $loja) {
                 if (!isset($lista[$loja])) {
