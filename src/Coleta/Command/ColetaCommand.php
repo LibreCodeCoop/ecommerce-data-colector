@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Goutte\Client;
+use ColetaDados\Scrappers\Lojas;
 
 class ColetaCommand extends Command
 {
@@ -22,9 +22,9 @@ class ColetaCommand extends Command
      */
     private $input;
     /**
-     * @var Client
+     * @var Lojas
      */
-    public $client;
+    private $lojas;
     protected function configure()
     {
         $this
@@ -71,25 +71,18 @@ class ColetaCommand extends Command
             return 0;
         }
     }
-
-    /**
-     * Retorna um client Goutte
-     *
-     * @return Client
-     */
-    private function getClient(): Client
+    
+    public function getLoja()
     {
-        if (!$this->client) {
-            $this->client = new Client([['verify' => false]]);
+        if (!$this->lojas) {
+            $this->lojas = new Lojas();
         }
-        return $this->client;
+        return $this->lojas;
     }
 
     private function getLojas(array $lojas)
     {
-        $crawler = $this->getClient()->request('GET', (string)$this->input->getOption('url'));
-        $html = $crawler->filter('.box-nossasLojas.superlojas')->html();
-        preg_match_all('/href="\/lista\/(?P<id>\d+).*?>(?P<loja>.*?)<\/a/', $html, $matches);
+        $lista = $this->getLoja()->getLojas((string)$this->input->getOption('url'));
         if (!$lojas) {
             $helper = $this->getHelper('question');
             $question = new ChoiceQuestion(
@@ -98,9 +91,9 @@ class ColetaCommand extends Command
                     function ($loja) {
                         return str_replace(' ', '-', $loja);
                     },
-                    $matches['loja']
+                    $lista['loja']
                 ),
-                implode(',', array_keys($matches['id']))
+                implode(',', array_keys($lista['id']))
             );
             $question->setMultiselect(true);
             $positionsResponses = $helper->ask($this->input, $this->output, $question);
@@ -109,14 +102,14 @@ class ColetaCommand extends Command
                     function ($loja) {
                         return str_replace(' ', '-', $loja);
                     },
-                    $matches['loja']
+                    $lista['loja']
                 ),
                 $positionsResponses
             );
-            $lojas = array_intersect_key($matches['id'], $realPositions);
+            $lojas = array_intersect_key($lista['id'], $realPositions);
         } else {
             foreach ($lojas as $loja) {
-                if (!isset($matches['id'][$loja])) {
+                if (!isset($lista['id'][$loja])) {
                     $this->output->writeln('Loja inválida');
                     $this->getLojas([]);
                     break;

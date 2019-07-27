@@ -39,13 +39,12 @@ class ColetaCommandTest extends TestCase
     {
         $application = new Application();
         $this->command = $application->find('coleta');
-        $this->command->client = new Client();
         $html = <<<HTML
             <div class="box-nossasLojas superlojas">
                 <a href="/lista/22">StoreName</a>
             </div>
             HTML;
-        $this->command->client->setClient($this->getGuzzle(
+        $this->command->getLoja()->client = (new Client())->setClient($this->getGuzzle(
             [new GuzzleResponse(200, [], $html)]
         ));
         $this->tester = new CommandTester($this->command);
@@ -91,7 +90,7 @@ class ColetaCommandTest extends TestCase
                 <a href="/lista/22">StoreName</a>
             </div>
             HTML;
-        $this->command->client->setClient($this->getGuzzle([
+        $this->command->getLoja()->client->setClient($this->getGuzzle([
             new GuzzleResponse(200, [], $html),
             new GuzzleResponse(200, [], $html)
         ]));
