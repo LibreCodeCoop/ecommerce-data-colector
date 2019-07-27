@@ -91,9 +91,9 @@ class ColetaCommand extends Command
                     function ($loja) {
                         return str_replace(' ', '-', $loja);
                     },
-                    $lista['loja']
+                    $lista
                 ),
-                implode(',', array_keys($lista['id']))
+                implode(',', array_keys($lista))
             );
             $question->setMultiselect(true);
             $positionsResponses = $helper->ask($this->input, $this->output, $question);
@@ -102,14 +102,14 @@ class ColetaCommand extends Command
                     function ($loja) {
                         return str_replace(' ', '-', $loja);
                     },
-                    $lista['loja']
+                    array_keys($lista)
                 ),
                 $positionsResponses
             );
-            $lojas = array_intersect_key($lista['id'], $realPositions);
+            $lojas = array_intersect_key(array_keys($lista), $realPositions);
         } else {
             foreach ($lojas as $loja) {
-                if (!isset($lista['id'][$loja])) {
+                if (!isset($lista[$loja])) {
                     $this->output->writeln('Loja inválida');
                     $this->getLojas([]);
                     break;

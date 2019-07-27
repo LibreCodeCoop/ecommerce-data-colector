@@ -101,4 +101,23 @@ class ColetaCommandTest extends TestCase
         ]);
         $this->assertContains('Loja inválida', $this->tester->getDisplay());
     }
+
+    public function testWithValidStores()
+    {
+        $html = <<<HTML
+            <div class="box-nossasLojas superlojas">
+                <a href="/lista/22">StoreName</a>
+            </div>
+            HTML;
+        $this->command->getLoja()->client->setClient($this->getGuzzle([
+            new GuzzleResponse(200, [], $html),
+            new GuzzleResponse(200, [], $html)
+        ]));
+        $this->tester = new CommandTester($this->command);
+        $this->tester->execute([
+            '--url'  => 'http://test/',
+            '--lojas' => [22]
+        ]);
+        $this->assertNotContains('Loja inválida', $this->tester->getDisplay());
+    }
 }
