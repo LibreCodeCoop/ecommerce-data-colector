@@ -1,0 +1,29 @@
+[
+  {
+    "id": "120796",
+    "sku": "958553",
+    "img": "http://teste/Assets/Produtos/Gigantes/958553.jpg",
+    "name": "Produto Um",
+    "href": "http://teste/produto/958553/slug-produto-um",
+    "price": 19.9,
+    "spy": false,
+    "code": "165281",
+    "score": 12,
+    "stock": 50,
+    "included": "Embalagem com 454g."
+  },
+  {
+    "id": "124360",
+    "sku": "10903",
+    "img": "http://teste/Assets/Produtos/Gigantes/289015.jpg",
+    "name": "Produto Dois",
+    "href": "http://teste/produto/10903/resina-filtek-z350-xt-3m-espe100539",
+    "price": 178,
+    "spy": true,
+    "code": "100539",
+    "original-price": 196.67,
+    "discount": "-25%",
+    "score": 2,
+    "stock": 0
+  }
+]

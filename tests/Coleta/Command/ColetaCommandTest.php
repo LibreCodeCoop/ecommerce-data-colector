@@ -7,6 +7,10 @@ use Symfony\Component\Lock\Store\FlockStore;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Goutte\Client;
 use Tests\TestCase;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\BrowserKit\HttpBrowser;
 
 class ColetaCommandTest extends TestCase
 {
@@ -25,9 +29,11 @@ class ColetaCommandTest extends TestCase
                 <a href="/lista/22">StoreName</a>
             </div>
             HTML;
-        $this->command->getLoja()->client = (new Client())->setClient($this->getGuzzle(
-            [new GuzzleResponse(200, [], $html)]
-        ));
+        $this->command->url = 'http://teste/';
+        $this->command->getLoja()->client = new HttpBrowser(new MockHttpClient([
+            new MockResponse($html, ['response_headers' => ['Set-cookie' => 1]]),
+            new MockResponse($html, ['response_headers' => ['Set-cookie' => 1]])
+        ]));
         $this->tester = new CommandTester($this->command);
     }
 
@@ -71,8 +77,9 @@ class ColetaCommandTest extends TestCase
                 <a href="/lista/22">StoreName</a>
             </div>
             HTML;
-        $this->command->getLoja()->client->setClient($this->getGuzzle([
-            new GuzzleResponse(200, [], $html),
+        $this->command->getLoja()->client = new HttpBrowser(new MockHttpClient([
+            new MockResponse($html, ['response_headers' => ['Set-cookie' => 1]]),
+            new MockResponse($html, ['response_headers' => ['Set-cookie' => 1]])
         ]));
         $this->tester = new CommandTester($this->command);
         $this->tester->execute([
@@ -89,8 +96,9 @@ class ColetaCommandTest extends TestCase
                 <a href="/lista/22">StoreName</a>
             </div>
             HTML;
-        $this->command->getLoja()->client->setClient($this->getGuzzle([
-            new GuzzleResponse(200, [], $html),
+        $this->command->getLoja()->client = new HttpBrowser(new MockHttpClient([
+            new MockResponse($html, ['response_headers' => ['Set-cookie' => 1]]),
+            new MockResponse($html, ['response_headers' => ['Set-cookie' => 1]])
         ]));
         $this->tester = new CommandTester($this->command);
         $this->tester->execute([

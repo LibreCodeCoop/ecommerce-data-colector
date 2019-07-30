@@ -25,6 +25,10 @@ class ColetaCommand extends Command
      * @var Lojas
      */
     private $lojas;
+    /**
+     * @var string
+     */
+    public $url;
     protected function configure()
     {
         $this
@@ -59,7 +63,9 @@ class ColetaCommand extends Command
             }
             $this->input = $input;
             $this->output = $output;
+            $this->url = (string)$this->input->getOption('url');
             $this->getLojas((array)$input->getOption('lojas'));
+            $produtos = $this->getLoja()->getProductsFromStore();
             $this->release();
         } catch (\Exception $e) {
             $this->release();
@@ -75,14 +81,15 @@ class ColetaCommand extends Command
     public function getLoja()
     {
         if (!$this->lojas) {
-            $this->lojas = new Lojas();
+            $this->lojas = new Lojas($this->url);
         }
         return $this->lojas;
     }
 
     private function getLojas(array $lojas)
     {
-        $lista = $this->getLoja()->getLojas((string)$this->input->getOption('url'));
+        $selected = [];
+        $lista = $this->getLoja()->getLojas();
         if (!$lojas) {
             $helper = $this->getHelper('question');
             $question = new ChoiceQuestion(
@@ -106,16 +113,20 @@ class ColetaCommand extends Command
                 ),
                 $positionsResponses
             );
-            $lojas = array_keys($realPositions);
+            $selected = array_filter($lista, function ($key) use ($realPositions) {
+                return isset($realPositions[$key]);
+            }, ARRAY_FILTER_USE_KEY);
         } else {
-            foreach ($lojas as $loja) {
-                if (!isset($lista[$loja])) {
+            foreach ($lojas as $idLoja) {
+                if (!isset($lista[$idLoja])) {
                     $this->output->writeln('Loja inválida');
                     $this->getLojas([]);
-                    break;
+                    return;
                 }
+                $selected[$idLoja] = $lista[$idLoja];
             }
         }
-        return $lojas;
+        $this->getLoja()->setLojas($selected);
+        return $selected;
     }
 }
