@@ -32,7 +32,9 @@
 		"duncan3dc/symfony-climate": "dev-master",
 		"symfony/http-client": "^5.0@dev",
 		"symfony/browser-kit": "^5.0@dev",
-		"symfony/css-selector": "^5.0@dev"
+		"symfony/css-selector": "^5.0@dev",
+		"robmorgan/phinx": "dev-master",
+		"vlucas/phpdotenv": "^3.4@dev"
 	},
 	"require-dev" : {
 		"phpunit/phpunit" : "^6.1",

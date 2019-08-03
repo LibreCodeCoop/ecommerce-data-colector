@@ -9,6 +9,11 @@ RUN apt-get install -y \
 RUN docker-php-ext-install -j "$(nproc)" \
         zip
 
+# Install Postgre PDO
+RUN apt-get install -y libpq-dev \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pgsql
+
 # Install xdebug
 RUN pecl install xdebug-2.8.0beta1 \
     && docker-php-ext-enable xdebug
