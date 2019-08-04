@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://teste/sitemap-institucionais.xml</loc>
+    <lastmod>2019-08-01T01:32:52-03:00</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://teste/sitemap-depto-Produto-1-50.xml</loc>
+    <lastmod>2019-08-01T01:32:52-03:00</lastmod>
+  </sitemap>
+</sitemapindex>

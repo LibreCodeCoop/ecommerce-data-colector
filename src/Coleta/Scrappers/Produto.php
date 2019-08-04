@@ -2,8 +2,7 @@
 namespace ColetaDados\Scrappers;
 
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\BrowserKit\HttpBrowser;
-use function GuzzleHttp\json_decode;
+use Cocur\Slugify\Slugify;
 
 class Produto extends Scrapper
 {
@@ -16,14 +15,22 @@ class Produto extends Scrapper
      */
     private $lastPage;
     /**
+     * @var Slugify
+     */
+    private $Slugify;
+    /**
+     * @var Score
+     */
+    public $score;
+    /**
      * Coleta dados de produtos
      * @param string $url
-     * @param HttpBrowser $client
      */
-    public function __construct(string $url, HttpBrowser $client)
+    public function __construct(string $url)
     {
         $this->url = $url;
-        $this->client = $client;
+        $this->Slugify = new Slugify();
+        $this->score = new Score();
     }
 
     public function getProductsFromStore(int $idLoja):array
@@ -43,21 +50,12 @@ class Produto extends Scrapper
             'GET',
             $this->url . '/lista/' . $idLoja . '/-/pag/' . $page
         );
+        $this->score->getStoreKey($crawler);
         $this->getLastPage($crawler);
-        $this->getAllProducts($crawler);
-        $this->getScore($crawler);
-    }
-    private function getStoreKey($crawler)
-    {
-        $html = $crawler->html();
-        preg_match('/script\/(?<storekey>.*)\/yvapi.js/', $html, $matches);
-        if (isset($matches['storekey'])) {
-            return $matches['storekey'];
-        }
-        return '';
+        $this->getAllProductsFromWeb($crawler);
     }
 
-    private function getLastPage($crawler):int
+    private function getLastPage(Crawler $crawler):int
     {
         $href = $crawler->filter('.pages .collection-pagination-pages .last-page');
         if (!$href->count()) {
@@ -67,9 +65,10 @@ class Produto extends Scrapper
         return $this->lastPage = (int) substr($href, strrpos($href, '/')+1);
     }
 
-    private function getAllProducts(Crawler $crawler)
+    private function getAllProductsFromWeb(Crawler $crawler)
     {
         $this->products = $crawler->filter('.collection.dept-collection.loadProducts li')->each(function (Crawler $node, $i) {
+            $product = [];
             $product['id'] = $node->attr('data-productid');
             $product['sku'] = $node->filterXPath('//*[@data-sku]')->attr('data-sku');
             $img = $node->filterXPath('//*/img[@data-src]');
@@ -80,13 +79,13 @@ class Produto extends Scrapper
             $product['href'] = $href->attr('href');
             $product['price'] = $this->textToFloat($href->text());
             $href = $node->filter('.collection-product-buy-bt')->attr('href');
-            preg_match("/ '(?<code>\d+)',(?<spy>true|false)/", $href, $matches);
+            preg_match("/ '(?<codigo>\d+)',(?<spy>true|false)/", $href, $matches);
             if (isset($matches['spy']) && $matches['spy'] == 'true') {
                 $product['spy'] = true;
             } else {
                 $product['spy'] = false;
             }
-            $product['code'] = $matches['code'];
+            $product['codigo'] = (int) $matches['codigo'];
             $smallDescription = $node->filter('.collection-product-description a');
             if ($smallDescription->count()) {
                 $product['included'] = $smallDescription->text();
@@ -100,7 +99,7 @@ class Produto extends Scrapper
             if ($score->count()) {
                 $product['score'] = (int) preg_replace('/[^\d]/', '', $score->text());
             }
-            $product['stock'] = $this->getStock($product['code']);
+            $product['stock'] = $this->getStock($product['codigo']);
             return $product;
         });
     }
@@ -109,7 +108,7 @@ class Produto extends Scrapper
     {
         $crawler = $this->getClient()->request(
             'GET',
-            $this->url . '/AddCarrinho?CodVar=' . $productCode . '&Qtd=999999999&source=cd&rand='.rand(1, 999)
+            $this->url . '/AddCarrinho?CodVar=' . $productCode . '&qtd=999999999'
         );
         $response = $crawler->filter('#AddCarrinhoStatus');
         if ($response->count()) {
@@ -120,34 +119,6 @@ class Produto extends Scrapper
             }
         }
         return 0;
-    }
-    
-    private function getScore($crawler)
-    {
-        $storeKey = $this->getStoreKey($crawler);
-        if (!$storeKey) {
-            return;
-        }
-        $ids = array_column($this->products, 'id');
-        $client = $this->getClient();
-        $client->request(
-            'GET',
-            'https://service.yourviews.com.br/review/productShelf' .
-            '?storeKey=' . $storeKey .
-            '&ids=' . implode(',', $ids)
-        );
-        $json = $client->getResponse()->getContent();
-        $stars = json_decode($json);
-        foreach ($this->products as $key => $product) {
-            foreach ($stars as $pos => $data) {
-                if ($data->productId == $product['id']) {
-                    preg_match('/\((?<score>\d+)\)/', $data->data, $matches);
-                    $this->products[$key]['score'] = (int) $matches['score'];
-                    unset($stars[$pos]);
-                    continue 2;
-                }
-            }
-        }
     }
 
     private function textToFloat(string $price):float
@@ -160,5 +131,110 @@ class Produto extends Scrapper
             $float = (float) $float;
         }
         return $float;
+    }
+    public function getCodigoFromUrl(string $url):int
+    {
+        preg_match('/produto\/(?<codigo>\d+)\//', $url, $match);
+        return (int) $match['codigo'];
+    }
+    public function getProdutoFromMobile(string $url, array $departamento)
+    {
+        $product = [];
+        $crawler = $this->getClient()->request('GET', $url);
+        $this->score->getStoreKey($crawler);
+        $product['url'] = $url;
+        $product['sku'] = $this->getCodigoFromUrl($url);
+        $name = $crawler->filter('.product-name');
+        $product['codigo'] = (int) $name->attr('data-code');
+        $product['id'] = (int) $name->attr('data-id');
+        $product['titulo'] = $crawler->filter('meta[property="og:title"]')->attr('content');
+        $product['marca'] = trim(substr(
+            $product['titulo'],
+            strrpos($product['titulo'], ' - ') + 3,
+        ));
+        $product['titulo'] = str_replace(' - ' . $product['marca'], '', $product['titulo']);
+        $product['imagens'] = $crawler
+            ->filter('.product-image-big img, .product-image-small img')
+            ->each(function ($node) {
+                return strtok($node->attr('src'), '?');
+            });
+        $this->getVariants($crawler, $product);
+        $restrict = $crawler->filter('.product-promo-restrict');
+        if (count($restrict)) {
+            $product['restrict'] = trim($restrict->text());
+        }
+        $product['descricao-curta'] = $crawler->filter('.product-shortDescription')->text();
+        $product['descricao-curta'] = trim(preg_replace('!\s+!', ' ', $product['descricao-curta']));
+        $product['price'] = $crawler->filter('.product-price-price')->text();
+        $product['price'] = $this->textToFloat($product['price']);
+        $this->getProdutoDescriptions($crawler, $product);
+        $originalPrice = $crawler->filter('.produt-oldPrice-price');
+        if ($originalPrice->count()) {
+            $product['original-price'] = $this->textToFloat($originalPrice->text());
+            $discount = $crawler->filter('.product-discountPercent');
+            $product['discount'] = trim($discount->text());
+        }
+        $splitPrice = $crawler->filter('.product-splitPrice-quantity');
+        if ($splitPrice->count()) {
+            $product['split-price-quantity'] = (int) $splitPrice->html();
+            $product['split-price-price'] = $this->textToFloat(
+                $crawler->filter('.product-splitPrice-price')->html()
+            );
+        }
+        return $product;
+    }
+    private function getVariants(Crawler $crawler, array &$product)
+    {
+        $variants = $crawler->filter('.product-variants-scroll tr')->each(function (Crawler $node) {
+            $return = [];
+            $a = $node->filter('[data-sku]');
+            $return['sku'] = (int) $a->attr('data-sku');
+            $return['codigo'] = (int) $a->attr('data-variantid');
+            $return['comprar'] = $a->text() == 'Comprar';
+            $return['title'] = trim($node->filter('.product-variant-title')->text());
+            $return['title'] = str_replace(' ' . $return['sku'], '', $return['title']);
+            $return['price'] = $node->filter('[data-Price]')->attr('data-price');
+            $return['price'] = $this->textToFloat($return['price']);
+            $return['image'] = strtok($node->filter('[data-variantImage]')->attr('data-variantimage'), '?');
+            if ($return['comprar']) {
+                $return['stock'] = $this->getStock($return['codigo']);
+            } else {
+                $return['stock'] = 0;
+            }
+            return $return;
+        });
+        if ($variants) {
+            foreach ($variants as $variant) {
+                if ($product['codigo'] == $variant['codigo']) {
+                    if (!in_array($variant['image'], $product['imagens'])) {
+                        $product['imagens'][] = $variant['image'];
+                    }
+                    $product['stock'] = $variant['stock'];
+                }
+                $product['variants'][$variant['sku']] = $variant;
+            }
+        } else {
+            $a = $crawler->filter('.product-variants a[data-sku]');
+            $product['comprar'] = $a->text() == 'Comprar';
+            if ($product['comprar']) {
+                $product['stock'] = $this->getStock($product['codigo']);
+            } else {
+                $product['stock'] = 0;
+            }
+        }
+    }
+    private function getProdutoDescriptions(Crawler $crawler, array &$product)
+    {
+        $metadata = $crawler->filter('.product-descriptions-item')->each(function ($node) {
+            return [
+                'id'   => $node->attr('data-description'),
+                'name' => $node->attr('data-name')
+            ];
+        });
+        foreach ($metadata as $data) {
+            $text = $crawler->filter('div[data-description-content='.$data['id'].']')->html();
+            $text = preg_replace('!\s+!', ' ', $text);
+            $product[$this->Slugify->slugify($data['name'])] = trim($text);
+        }
     }
 }

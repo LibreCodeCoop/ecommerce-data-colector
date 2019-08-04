@@ -67,7 +67,10 @@ class ColetaCommandTest extends TestCase
         $this->tester->execute([
             '--url'  => 'http://test/'
         ]);
-        $this->assertContains('Informe as lojas desejadas', $this->tester->getDisplay());
+        $this->assertContains(
+            'Necessário informar a forma de coleta de dados que deseja realizar',
+            $this->tester->getDisplay()
+        );
     }
 
     public function testWithInvalidStores()

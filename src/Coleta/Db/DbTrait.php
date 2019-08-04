@@ -11,7 +11,7 @@ trait DbTrait
     {
         $this->pdo = $db;
     }
-    public function save($data, $table, $pk)
+    public function insert($data, $table, $pk)
     {
         $this->pdo->beginTransaction();
         $in  = implode(',', array_fill(0, count($data), '?'));
@@ -20,13 +20,13 @@ trait DbTrait
         );
         $sth->execute(array_keys($data));
         $exist = $sth->fetchAll(\PDO::FETCH_COLUMN, 0);
-        $toInsert = array_filter($data, function($row) use($exist, $pk) {
+        $toInsert = array_filter($data, function ($row) use ($exist, $pk) {
             return !in_array($row[$pk], $exist);
         });
         if (count($toInsert)) {
             $columns = array_keys(current($data));
             $insert =
-            'INSERT INTO '.$table.' ('.implode(',',$columns).')'.
+            'INSERT INTO '.$table.' ('.implode(',', $columns).')'.
             ' VALUES ' .
             implode(
                 ',',
@@ -37,11 +37,20 @@ trait DbTrait
                 )
             );
             $sth = $this->pdo->prepare($insert);
-            $values = array_reduce($toInsert, function($carry, $item) {
+            $values = array_reduce($toInsert, function ($carry, $item) {
                 return array_merge($carry, array_values($item));
             }, []);
                 $sth->execute($values);
         }
         $this->pdo->commit();
+    }
+    public function update($table, $set, $where, $data)
+    {
+        $update =
+            'UPDATE ' . $table . ' ' .
+            'SET ' . implode(',', $set) . ' ' .
+            'WHERE ' . implode(',', $where);
+        $sth = $this->pdo->prepare($update);
+        $sth->execute($data);
     }
 }

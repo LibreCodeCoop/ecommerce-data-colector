@@ -193,3 +193,20 @@
     </div>
   </condicao:paginacao>
 </div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    var day = new Date();
+    $('#seloEbit img').attr('src',$('#seloEbit img').attr('src')+'?v'+day.getDate());
+    <!-- Yourviews -->
+    (function () {
+        var yvs = document.createElement("script");
+        yvs.type = "text/javascript";
+        yvs.async = true;
+        yvs.id = "_yvsrc";
+        yvs.src = "//service.yourviews.com.br/script/IDYVIAPI/yvapi.js";
+        var yvs_script = document.getElementsByTagName("script")[0];
+        yvs_script.parentNode.insertBefore(yvs, yvs_script);
+    })();
+    <!-- End of Yourviews -->
+  });
+</script> 

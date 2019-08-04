@@ -1,0 +1,64 @@
+{
+  "50": {
+    "sitemap": "http:\/\/teste\/sitemap-depto-Produto-1-50.xml",
+    "codigo": 50,
+    "nome": "Produto 1",
+    "url": "http://teste/departamento/50/anestesicos-e-agulha-gengival",
+    "produtos": {
+      "100": {
+        "url": "http://teste/produto/100/produto-01",
+        "sku": 100,
+        "codigo": 100,
+        "id": 102,
+        "titulo": "Titulo Produto 1",
+        "marca": "Marca",
+        "imagens": [
+          "http://teste/Assets/Produtos/Gigantes/123v2.jpg",
+          "http://teste/Assets/Produtos/Pequenas/123v2.jpg",
+          "http://teste/Assets/Produtos/Gigantes/123.jpg"
+        ],
+        "variants": {
+            "268355": {
+                "sku": 268355,
+                "codigo": 100,
+                "comprar": true,
+                "title": "30G - Curta",
+                "price": 39.69,
+                "image": "http:\/\/teste\/Assets\/Produtos\/Gigantes\/123.jpg",
+                "stock": 4
+            },
+            "379907": {
+                "sku": 379907,
+                "codigo": 100071,
+                "comprar": true,
+                "title": "30G - Extra Curta",
+                "price": 39.69,
+                "image": "http:\/\/teste\/Assets\/Produtos\/Gigantes\/379907_2.jpg",
+                "stock": 4
+            },
+            "379884": {
+                "sku": 379884,
+                "codigo": 100072,
+                "comprar": false,
+                "title": "27G - Longa",
+                "price": 39.69,
+                "image": "http:\/\/teste\/Assets\/Produtos\/Gigantes\/379884_2.jpg",
+                "stock": 0
+            }
+        },
+        "descricao-curta": "Descrição curta",
+        "price": 850.3,
+        "indicacao": "Indicação Texto",
+        "caracteristicas": "Características Texto",
+        "itens-inclusos": "Itens Inclusos Texto",
+        "material-de-apoio": "<img src=\"parte1.jpg\"><img src=\"parte2.jpg\">",
+        "original-price": 2031.84,
+        "discount": "-35%",
+        "split-price-quantity": 3,
+        "split-price-price": 284.1,
+        "stock": 4,
+        "score": 12
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+<head>
+<meta property="og:title" content="Titulo Produto 2 - Marca">
+</head>
+<body>
+  <div id="divImagemProduto">
+    <div class="product-image-big">
+      <img src="http://teste/Assets/Produtos/Gigantes/123v2.jpg" />
+    </div>
+  </div>
+  <div class="product-shortDescription">Descrição curta</div>
+  <span itemprop="price" class="product-price-price">R$699,01</span>
+  <div class="product-buy">
+      <a class="product-variant-buy-bt" data-variantId="567">Comprar</a>
+  </div>
+  <repeticao:abas>
+    <li class="product-descriptions-item" data-description="1"
+      data-name="Indicação"></li>
+
+    <li class="product-descriptions-item" data-description="2"
+      data-name="Características"></li>
+
+    <li class="product-descriptions-item" data-description="3"
+      data-name="Itens Inclusos"></li>
+  </repeticao:abas>
+  <repeticao:conteudo>
+    <div data-description-content="1">Indicação Texto</div>
+
+    <div data-description-content="2">Características Texto</div>
+
+    <div data-description-content="3">Itens Inclusos Texto</div>
+  </repeticao:conteudo>
+</body>
+<script type="text/javascript">
+  $(window).load(function() {
+    <!-- Yourviews -->
+    (function () {
+        var yvs = document.createElement("script");
+        yvs.type = "text/javascript";
+        yvs.async = true;
+        yvs.id = "_yvsrc";
+        yvs.src = "//service.yourviews.com.br/script/storekey/yvapi.js";
+        var yvs_script = document.getElementsByTagName("script")[0];
+        yvs_script.parentNode.insertBefore(yvs, yvs_script);
+    })();
+    <!-- End of Yourviews -->
+  });
+</script>

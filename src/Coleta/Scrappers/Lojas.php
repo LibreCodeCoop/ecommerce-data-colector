@@ -30,28 +30,20 @@ class Lojas extends Scrapper
             $nomes = array_map(function ($nome) {
                 return ['nome' => $nome];
             }, $matches['loja']);
-            $this->lojas = array_combine($matches['id'], $nomes);
+            $this->lojas = array_combine(array_map('intval', $matches['id']), $nomes);
         }
         return $this->lojas;
     }
-    public function getProductsFromStore(array $lojas = []):array
+    public function getProductsFromStore():array
     {
-        $this->Produto = new Produto($this->url, $this->client);
-        if (!$lojas) {
-            $lojas = $this->lojas;
-        }
-        if (!is_array($lojas) || !count($lojas)) {
+        $this->Produto = new Produto($this->url);
+        $this->Produto->client = $this->client;
+        if (!is_array($this->lojas) || !count($this->lojas)) {
             return [];
         }
-        foreach ($lojas as $idLoja => $loja) {
+        foreach ($this->lojas as $idLoja => $loja) {
             $this->lojas[$idLoja]['produtos'] = $this->Produto->getProductsFromStore($idLoja);
         }
-        return $this->lojas;
-    }
-    public function getAllData()
-    {
-        $this->getLojas();
-        $this->getProductsFromStore();
         return $this->lojas;
     }
 }

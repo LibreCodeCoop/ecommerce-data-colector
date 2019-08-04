@@ -7,10 +7,9 @@
     "href": "http://teste/produto/958553/slug-produto-um",
     "price": 19.9,
     "spy": false,
-    "code": "165281",
-    "score": 12,
-    "stock": 50,
-    "included": "Embalagem com 454g."
+    "codigo": "165281",
+    "included": "Embalagem com 454g.",
+    "stock": 50
   },
   {
     "id": "124360",
@@ -20,10 +19,10 @@
     "href": "http://teste/produto/10903/resina-filtek-z350-xt-3m-espe100539",
     "price": 178,
     "spy": true,
-    "code": "100539",
+    "codigo": "100539",
     "original-price": 196.67,
     "discount": "-25%",
-    "score": 2,
+    "score": 46,
     "stock": 0
   }
 ]

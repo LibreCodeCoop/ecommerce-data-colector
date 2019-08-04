@@ -9,6 +9,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use ColetaDados\Scrappers\Lojas;
+use ColetaDados\Scrappers\Departamentos;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Cocur\Slugify\Slugify;
 
 class ColetaCommand extends Command
 {
@@ -29,6 +32,10 @@ class ColetaCommand extends Command
      * @var string
      */
     public $url;
+    /**
+     * @var \PDO
+     */
+    private $pdo;
     protected function configure()
     {
         $this
@@ -36,7 +43,8 @@ class ColetaCommand extends Command
             ->setDescription('Coleta dados em site de e-commerce.')
             ->setDefinition([
                 new InputOption('url', 'u', InputOption::VALUE_REQUIRED, 'Base URL do site'),
-                new InputOption('lojas', 'l', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Lista de lojas')
+                new InputOption('lojas', 'l', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Lista de lojas'),
+                new InputOption('departamentos', 'd', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Lista de departamentos')
             ])
             ->setHelp(<<<HELP
                 O comando <info>coleta</info> realiza a coletat de dados.
@@ -46,6 +54,12 @@ class ColetaCommand extends Command
                 HELP
             )
         ;
+        $this->pdo = new \PDO(
+            'pgsql:host='.getenv('DB_HOST').';'.
+                'dbname='.getenv('DB_NAME').';'.
+                'user='.getenv('DB_USER').';'.
+                'password='.getenv('DB_PASSWD')
+        );
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -64,8 +78,16 @@ class ColetaCommand extends Command
             $this->input = $input;
             $this->output = $output;
             $this->url = (string)$this->input->getOption('url');
-            $this->getLojas((array)$input->getOption('lojas'));
-            $produtos = $this->getLoja()->getProductsFromStore();
+            if ($input->getOption('lojas')) {
+                $this->getLojas((array)$input->getOption('lojas'));
+                $produtos = $this->getLoja()->getProductsFromStore();
+            } elseif ($input->getOption('departamentos')) {
+                $this->getDepartamentos((array)$input->getOption('departamentos'));
+            } else {
+                throw new \Exception(
+                    '<error>Necessário informar a forma de coleta de dados que deseja realizar</error>'
+                );
+            }
             $this->release();
         } catch (\Exception $e) {
             $this->release();
@@ -84,6 +106,29 @@ class ColetaCommand extends Command
             $this->lojas = new Lojas($this->url);
         }
         return $this->lojas;
+    }
+    private function getDepartamentos(array $departamentos)
+    {
+        $lista = new Departamentos($this->url, $this->pdo);
+        $lista->setDepartamentos(array_intersect_key($lista->getDepartmentSitemapFromSitemapIndex(), array_flip($departamentos)));
+        $departments = $lista->getDepartmentSitemapFromSitemapIndex();
+        $progressBar = new ProgressBar($this->output, count($departments));
+        $progressBar->start();
+        $slug = new Slugify();
+        foreach ($departments as $department) {
+            $department = $lista->processSitemap($department);
+            $filename =
+                'data-'.$department['codigo'].'-'.
+                $slug->slugify($department['nome']).'-'.
+                date('YmdHis').'.json';
+            file_put_contents(
+                $filename,
+                json_encode($department, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)
+            );
+            $progressBar->advance();
+        }
+        $progressBar->finish();
+        $this->output->writeln('');
     }
 
     private function getLojas(array $lojas)
