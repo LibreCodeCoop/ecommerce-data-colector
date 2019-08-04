@@ -21,7 +21,7 @@ class Application extends BaseApplication
             $output->writeln('<error>Suporte apenas para PHP 7.3.2 ou maior.</error>');
         }
 
-        parent::doRun($input, $output);
+        return parent::doRun($input, $output);
     }
 
     public function getHelp()
