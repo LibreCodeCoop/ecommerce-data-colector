@@ -14,6 +14,14 @@ RUN apt-get install -y libpq-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql
 
+RUN git clone https://github.com/nikic/php-ast.git \
+    && cd php-ast \
+    && phpize \
+    && ./configure \
+    && make install \
+    && echo 'extension=ast.so' > /usr/local/etc/php/php.ini \
+    && cd .. && rm -rf php-ast
+
 # Install xdebug
 RUN pecl install xdebug-2.8.0beta1 \
     && docker-php-ext-enable xdebug
