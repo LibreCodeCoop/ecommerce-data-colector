@@ -41,7 +41,7 @@ class Lojas extends Scrapper
         if (!is_array($this->lojas) || !count($this->lojas)) {
             return [];
         }
-        foreach ($this->lojas as $idLoja => $loja) {
+        foreach ($this->lojas as $idLoja => $name) {
             $this->lojas[$idLoja]['produtos'] = $this->Produto->getProductsFromStore($idLoja);
         }
         return $this->lojas;

@@ -67,7 +67,7 @@ class Produto extends Scrapper
 
     private function getAllProductsFromWeb(Crawler $crawler)
     {
-        $this->products = $crawler->filter('.collection.dept-collection.loadProducts li')->each(function (Crawler $node, $i) {
+        $this->products = $crawler->filter('.collection.dept-collection.loadProducts li')->each(function (Crawler $node) {
             $product = [];
             $product['id'] = $node->attr('data-productid');
             $product['sku'] = $node->filterXPath('//*[@data-sku]')->attr('data-sku');
@@ -121,7 +121,7 @@ class Produto extends Scrapper
         return 0;
     }
 
-    private function textToFloat(string $price):float
+    private static function textToFloat(string $price):float
     {
         $float = 0.0;
         preg_match('/(\d+(.|,))+(\d)+/', $price, $matches);
@@ -132,12 +132,12 @@ class Produto extends Scrapper
         }
         return $float;
     }
-    public function getCodigoFromUrl(string $url):int
+    public static function getCodigoFromUrl(string $url):int
     {
         preg_match('/produto\/(?<codigo>\d+)\//', $url, $match);
         return (int) $match['codigo'];
     }
-    public function getProdutoFromMobile(string $url, array $departamento)
+    public function getProdutoFromMobile(string $url)
     {
         $product = [];
         $crawler = $this->getClient()->request('GET', $url);

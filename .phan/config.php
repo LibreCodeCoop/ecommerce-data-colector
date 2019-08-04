@@ -54,12 +54,20 @@ return [
 
         // can also be written as 'vendor/phan/phan/.phan/plugins/AlwaysReturnPlugin.php'
         'AlwaysReturnPlugin',
+        'DollarDollarPlugin',
+        'DuplicateArrayKeyPlugin',
+        'DuplicateExpressionPlugin',
+        'EmptyStatementListPlugin',
+        'InvalidVariableIssetPlugin',
+        'NoAssertPlugin',
+        'PossiblyStaticMethodPlugin',
+        'PreferNamespaceUsePlugin',
+        'PregRegexCheckerPlugin',
+        'PrintfCheckerPlugin',
+        'SuspiciousParamOrderPlugin',
         // Checks for syntactically unreachable statements in
         // the global scope or function bodies.
         'UnreachableCodePlugin',
-        'DollarDollarPlugin',
-        'DuplicateArrayKeyPlugin',
-        'PregRegexCheckerPlugin',
-        'PrintfCheckerPlugin',
+        'WhitespacePlugin'
     ],
 ];

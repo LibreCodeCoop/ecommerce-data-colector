@@ -75,8 +75,9 @@ class Departamentos extends Scrapper
                     if (isset($this->departamentos[$departamento['codigo']]['produtos'][$codigoProduto])) {
                         break;
                     }
+                    $produto = [];
                     try {
-                        $produto = $this->produto->getProdutoFromMobile($url, $departamento);
+                        $produto = $this->produto->getProdutoFromMobile($url);
                     } catch (\Exception $e) {
                         $produto['error'] = $e->getMessage();
                     }

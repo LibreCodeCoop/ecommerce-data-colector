@@ -8,8 +8,8 @@ class Score extends Scrapper
     /**
      * @var string
      */
-    private $storeKey;
-    public function scores(array $idProducts)
+    private $storeKey = '';
+    public function scores(array $idProducts):array
     {
         $client = $this->getClient();
         $client->request(
@@ -32,7 +32,7 @@ class Score extends Scrapper
         }
         return $return;
     }
-    public function getStoreKey(Crawler $crawler)
+    public function getStoreKey(Crawler $crawler):string
     {
         if (!$this->storeKey && $crawler) {
             $html = $crawler->html();

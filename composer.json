@@ -52,11 +52,12 @@
 		"unit" : "php -d phar.readonly=0 vendor/bin/phpunit --coverage-clover ./tests/log/clover.xml --colors=always",
 		"unit-html" : "php -d phar.readonly=0 vendor/bin/phpunit --coverage-html ./tests/log/ --colors=always",
 		"phpstan" : "vendor/bin/phpstan analyse src --level 7",
+		"phan" : "vendor/bin/phan",
 		"test" : [
 			"@unit",
 			"@phpcs",
 			"@phplint",
-			"@phpstan"
+			"@phan"
 		]
 	},
 	"bin" : [

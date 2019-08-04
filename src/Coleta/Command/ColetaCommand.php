@@ -48,7 +48,7 @@ class ColetaCommand extends Command
             ])
             ->setHelp(<<<HELP
                 O comando <info>coleta</info> realiza a coletat de dados.
-                
+
                 Maiores informações:
                     https://github.com/LyseonTech/ecommerce-data-colector
                 HELP
@@ -80,7 +80,7 @@ class ColetaCommand extends Command
             $this->url = (string)$this->input->getOption('url');
             if ($input->getOption('lojas')) {
                 $this->getLojas((array)$input->getOption('lojas'));
-                $produtos = $this->getLoja()->getProductsFromStore();
+                $this->getLoja()->getProductsFromStore();
             } elseif ($input->getOption('departamentos')) {
                 $this->getDepartamentos((array)$input->getOption('departamentos'));
             } else {
@@ -99,7 +99,7 @@ class ColetaCommand extends Command
             return 0;
         }
     }
-    
+
     public function getLoja()
     {
         if (!$this->lojas) {
