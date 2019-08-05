@@ -3,6 +3,7 @@ namespace ColetaDados\Scrappers;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Cocur\Slugify\Slugify;
+use ColetaDados\Db\DbTrait;
 
 class Produto extends Scrapper
 {
@@ -22,6 +23,7 @@ class Produto extends Scrapper
      * @var Score
      */
     public $score;
+    use DbTrait;
     /**
      * Coleta dados de produtos
      * @param string $url
@@ -134,10 +136,10 @@ class Produto extends Scrapper
     }
     public static function getCodigoFromUrl(string $url):int
     {
-        preg_match('/produto\/(?<codigo>\d+)\//', $url, $match);
-        return (int) $match['codigo'];
+        $path = explode('/', parse_url($url, PHP_URL_PATH));
+        return $path[2];
     }
-    public function getProdutoFromMobile(string $url)
+    public function getProdutoFromMobile(string $url, $departamento)
     {
         $product = [];
         $crawler = $this->getClient()->request('GET', $url);
@@ -163,24 +165,25 @@ class Produto extends Scrapper
         if (count($restrict)) {
             $product['restrict'] = trim($restrict->text());
         }
-        $product['descricao-curta'] = $crawler->filter('.product-shortDescription')->text();
-        $product['descricao-curta'] = trim(preg_replace('!\s+!', ' ', $product['descricao-curta']));
+        $product['descricao_curta'] = $crawler->filter('.product-shortDescription')->text();
+        $product['descricao_curta'] = trim(preg_replace('!\s+!', ' ', $product['descricao_curta']));
         $product['price'] = $crawler->filter('.product-price-price')->text();
         $product['price'] = $this->textToFloat($product['price']);
         $this->getProdutoDescriptions($crawler, $product);
         $originalPrice = $crawler->filter('.produt-oldPrice-price');
         if ($originalPrice->count()) {
-            $product['original-price'] = $this->textToFloat($originalPrice->text());
+            $product['original_price'] = $this->textToFloat($originalPrice->text());
             $discount = $crawler->filter('.product-discountPercent');
             $product['discount'] = trim($discount->text());
         }
         $splitPrice = $crawler->filter('.product-splitPrice-quantity');
         if ($splitPrice->count()) {
-            $product['split-price-quantity'] = (int) $splitPrice->html();
-            $product['split-price-price'] = $this->textToFloat(
+            $product['split_price_quantity'] = (int) $splitPrice->html();
+            $product['split_price_price'] = $this->textToFloat(
                 $crawler->filter('.product-splitPrice-price')->html()
             );
         }
+        $product['departamento'] = $departamento;
         return $product;
     }
     private function getVariants(Crawler $crawler, array &$product)
@@ -188,9 +191,9 @@ class Produto extends Scrapper
         $variants = $crawler->filter('.product-variants-scroll tr')->each(function (Crawler $node) {
             $return = [];
             $a = $node->filter('[data-sku]');
-            $return['sku'] = (int) $a->attr('data-sku');
+            $return['sku'] = $a->attr('data-sku');
             $return['codigo'] = (int) $a->attr('data-variantid');
-            $return['comprar'] = $a->text() == 'Comprar';
+            $return['comprar'] = $a->text() == 'Comprar'?1:0;
             $return['title'] = trim($node->filter('.product-variant-title')->text());
             $return['title'] = str_replace(' ' . $return['sku'], '', $return['title']);
             $return['price'] = $node->filter('[data-Price]')->attr('data-price');
@@ -205,17 +208,11 @@ class Produto extends Scrapper
         });
         if ($variants) {
             foreach ($variants as $variant) {
-                if ($product['codigo'] == $variant['codigo']) {
-                    if (!in_array($variant['image'], $product['imagens'])) {
-                        $product['imagens'][] = $variant['image'];
-                    }
-                    $product['stock'] = $variant['stock'];
-                }
                 $product['variants'][$variant['sku']] = $variant;
             }
         } else {
             $a = $crawler->filter('.product-variants a[data-sku]');
-            $product['comprar'] = $a->text() == 'Comprar';
+            $product['comprar'] = $a->text() == 'Comprar'?1:0;
             if ($product['comprar']) {
                 $product['stock'] = $this->getStock($product['codigo']);
             } else {
@@ -234,7 +231,42 @@ class Produto extends Scrapper
         foreach ($metadata as $data) {
             $text = $crawler->filter('div[data-description-content='.$data['id'].']')->html();
             $text = preg_replace('!\s+!', ' ', $text);
-            $product[$this->Slugify->slugify($data['name'])] = trim($text);
+            $product['descriptions'][$this->Slugify->slugify($data['name'], '_')] = trim($text);
+        }
+    }
+    public function save(array $produto)
+    {
+        $data = $produto;
+        if (isset($data['variants'])) {
+            $variants = $data['variants'];
+            unset($data['variants']);
+        }
+        $data['metadata'] = $data;
+        unset(
+            $data['imagens'],
+            $data['descriptions'],
+            $data['split_price_quantity'],
+            $data['split_price_price'],
+            $data['original_price'],
+            $data['discount'],
+            $data['price'],
+            $data['stock'],
+            $data['descricao_curta'],
+            $data['metadata']['url'],
+            $data['metadata']['titulo'],
+            $data['metadata']['marca'],
+            $data['metadata']['codigo'],
+            $data['metadata']['sku'],
+            $data['metadata']['id'],
+            $data['metadata']['departamento']
+            );
+        $data['metadata'] = json_encode($data);
+        $this->insert($data, 'produto', 'sku');
+        if (isset($variants)) {
+            foreach($variants as &$variant) {
+                $variant['produto_sku'] = $data['sku'];
+            }
+            $this->insert($variants, 'variant', 'sku');
         }
     }
 }
