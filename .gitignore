@@ -29,3 +29,6 @@ tests/log
 .phplint-cache
 
 *.csv
+
+# Docker volumes
+.docker/volumes
