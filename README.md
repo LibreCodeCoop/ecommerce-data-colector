@@ -9,8 +9,6 @@ Coleta de de dados em site de e-commerce
 
 ## Docker
 
-Executar a aplicação via Docker é recomendável para quem queira ter um ambiente isolado e controlado sem ter necessidade de realizar alterações no sistema operacional. Esta é a solução mais recomendável para desenvolvedores do projeto.
-
 A execução do projeto com Docker é bem simples:
 
 ```bash
@@ -19,12 +17,6 @@ cd coleta-dados
 cp .env.develop .env
 docker-compose up -d
 ```
-Nos comandos abaixo, onde você lê `coleta-dados.phar` coloque o seguinte
-comando:
-
-```bash
-docker-compose exec php7 bin/coleta-dados.php
-```
 
 exemplo:
 
@@ -32,12 +24,33 @@ exemplo:
 docker-compose exec php7 bin/coleta-dados.php coleta --help
 ```
 
-## PHAR
+O comando `coleta` é o padrão, então é opcional informar o comando `coleta`
 
-Executar a aplicação via `phar` é para usuários finais.
+```
+Options:
+  -u, --url=URL                        Base URL do site
+  -l, --lojas[=LOJAS]                  Lista de lojas (multiple values allowed)
+  -d, --departamentos[=DEPARTAMENTOS]  Lista de departamentos (multiple values allowed)
+```
 
-Baixe a versão mais recente do projeto em [releases](https://github.com/LyseonTech/coleta-coleta-dados/releases/latest/download/coleta-dados.phar)
+Ou utilize lojas ou utilize departamentos.
 
-## Notas para desenvolvedores
+## Fluxo a partir de lojas
 
-Para gerar o arquivo `phar` do projeto execute o script `bin/compile`
+Não está 100% funcional
+
+## Fluxo a partir de departamentos
+
+Exemplo
+
+```bash
+docker-compose exec php7 bin/coleta-dados.php --url=http://teste --departamentos=123 --departamentos=456
+```
+
+Onde: `123` e `456` são os códigos de departamentos.
+
+## Output
+
+A saída de dados é no banco PostgreSQL. Para acessá-lo utilize o cliente PostgreSQL de sua preferência com as credenciais que estão em seu arquivo `.env`
+
+O modelo do banco de dados pode ser encontrado nos scripts de migration na pasta db ou conferindo diretamente no banco.
