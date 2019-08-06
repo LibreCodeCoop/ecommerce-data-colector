@@ -16,9 +16,22 @@ class mockPDO extends \PDO
 class DepartamentosTest extends TestCase
 {
     public function testGetDepartamentosReturnListOfDepartamentos() {
+        $fetchAllMock = $this
+            ->getMockBuilder('PDOStatement')
+            ->setMethods(['fetchAll'])
+            ->getMock();
+        $fetchAllMock
+            ->expects($this->any())
+            ->method('fetchAll')
+            ->will($this->returnValue([]));
+
+        $mockPdo = $this->getMockBuilder(mockPDO::class)
+            ->getMock();
+        $mockPdo->method('prepare')
+           ->will($this->returnValue($fetchAllMock));
         $path = __DIR__.'/Fixtures/departamentos/';
         $mock = $this->getMockBuilder(Departamentos::class)
-            ->setConstructorArgs(['http://teste', new mockPDO()])
+            ->setConstructorArgs(['http://teste', $mockPdo])
             ->setMethods(['insert', 'update'])
             ->getMock();
         $mock->client = new HttpBrowser(new MockHttpClient([

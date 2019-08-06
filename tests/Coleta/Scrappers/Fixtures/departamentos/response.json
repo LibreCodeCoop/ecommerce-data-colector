@@ -7,56 +7,68 @@
     "produtos": {
       "100": {
         "url": "http://teste/produto/100/produto-01",
-        "sku": 100,
+        "sku": "100",
         "codigo": 100,
         "id": 102,
         "titulo": "Titulo Produto 1",
         "marca": "Marca",
         "imagens": [
           "http://teste/Assets/Produtos/Gigantes/123v2.jpg",
-          "http://teste/Assets/Produtos/Pequenas/123v2.jpg",
-          "http://teste/Assets/Produtos/Gigantes/123.jpg"
+          "http://teste/Assets/Produtos/Pequenas/123v2.jpg"
         ],
         "variants": {
             "268355": {
-                "sku": 268355,
+                "sku": "268355",
                 "codigo": 100,
-                "comprar": true,
+                "comprar": 1,
                 "title": "30G - Curta",
                 "price": 39.69,
                 "image": "http:\/\/teste\/Assets\/Produtos\/Gigantes\/123.jpg",
                 "stock": 4
             },
             "379907": {
-                "sku": 379907,
+                "sku": "379907",
                 "codigo": 100071,
-                "comprar": true,
+                "comprar": 1,
                 "title": "30G - Extra Curta",
                 "price": 39.69,
                 "image": "http:\/\/teste\/Assets\/Produtos\/Gigantes\/379907_2.jpg",
                 "stock": 4
             },
             "379884": {
-                "sku": 379884,
+                "sku": "379884",
                 "codigo": 100072,
-                "comprar": false,
+                "comprar": 0,
                 "title": "27G - Longa",
                 "price": 39.69,
                 "image": "http:\/\/teste\/Assets\/Produtos\/Gigantes\/379884_2.jpg",
                 "stock": 0
             }
         },
-        "descricao-curta": "Descrição curta",
+        "promos": [
+            {
+                "type": "restrict",
+                "text": "Aten\u00e7\u00e3o: Venda restrita"
+            },
+            {
+                "type": "gift",
+                "text": "BAIXOU! Aproveite nossas ofertas!"
+            }
+        ],
+        "descricao_curta": "Descrição curta",
         "price": 850.3,
-        "indicacao": "Indicação Texto",
-        "caracteristicas": "Características Texto",
-        "itens-inclusos": "Itens Inclusos Texto",
-        "material-de-apoio": "<img src=\"parte1.jpg\"><img src=\"parte2.jpg\">",
-        "original-price": 2031.84,
+        "descriptions": {
+            "indicacao": "Indicação Texto",
+            "caracteristicas": "Características Texto",
+            "itens_inclusos": "Itens Inclusos Texto",
+            "material_de_apoio": "<img src=\"parte1.jpg\"><img src=\"parte2.jpg\">"
+        },
+        "original_price": 2031.84,
         "discount": "-35%",
-        "split-price-quantity": 3,
-        "split-price-price": 284.1,
-        "stock": 4,
+        "split_price_quantity": 3,
+        "split_price_price": 284.1,
+        "best_price": 35.62,
+        "departamento": 50,
         "score": 12
       }
     }

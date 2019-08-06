@@ -51,8 +51,8 @@ trait DbTrait
                         0,
                         count($toInsert),
                         '('.implode(',', array_fill(0, count($columns), '?')).')'
-                        )
-                    );
+                    )
+                );
             } else {
                 $columns = array_keys($data);
                 $values = array_values($data);

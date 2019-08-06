@@ -94,7 +94,7 @@ class Produto extends Scrapper
             }
             $originalPrice = $node->filterXPath('//*/del');
             if ($originalPrice->count()) {
-                $product['original-price'] = $this->textToFloat($originalPrice->text());
+                $product['original_price'] = $this->textToFloat($originalPrice->text());
                 $product['discount'] = trim($node->filter('.collection-product-discountPercent')->text());
             }
             $score = $node->filter('.yv-bootstrap');
@@ -134,7 +134,7 @@ class Produto extends Scrapper
         }
         return $float;
     }
-    public static function getCodigoFromUrl(string $url):int
+    public static function getCodigoFromUrl(string $url):string
     {
         $path = explode('/', parse_url($url, PHP_URL_PATH));
         return $path[2];
@@ -161,10 +161,7 @@ class Produto extends Scrapper
                 return strtok($node->attr('src'), '?');
             });
         $this->getVariants($crawler, $product);
-        $restrict = $crawler->filter('.product-promo-restrict');
-        if (count($restrict)) {
-            $product['restrict'] = trim($restrict->text());
-        }
+        $this->getPromos($crawler, $product);
         $product['descricao_curta'] = $crawler->filter('.product-shortDescription')->text();
         $product['descricao_curta'] = trim(preg_replace('!\s+!', ' ', $product['descricao_curta']));
         $product['price'] = $crawler->filter('.product-price-price')->text();
@@ -183,8 +180,25 @@ class Produto extends Scrapper
                 $crawler->filter('.product-splitPrice-price')->html()
             );
         }
+        $bestPrice = $crawler->filter('.product-bestPrice strong');
+        if (count($bestPrice)) {
+            $product['best_price'] = $this->textToFloat($bestPrice->text());
+        }
         $product['departamento'] = $departamento;
         return $product;
+    }
+    private static function getPromos(Crawler $crawler, array &$product)
+    {
+        $promos = $crawler->filter('.product-promo')->each(function (Crawler $node) {
+            $return = [];
+            $return['type'] = $node->attr('class');
+            $return['type'] = trim(str_replace('product-promo', '', $return['type']), ' -');
+            $return['text'] = $node->text();
+            return $return;
+        });
+        if ($promos) {
+            $product['promos'] = $promos;
+        }
     }
     private function getVariants(Crawler $crawler, array &$product)
     {
@@ -251,6 +265,7 @@ class Produto extends Scrapper
             $data['discount'],
             $data['price'],
             $data['stock'],
+            $data['promos'],
             $data['descricao_curta'],
             $data['metadata']['url'],
             $data['metadata']['titulo'],
@@ -259,11 +274,11 @@ class Produto extends Scrapper
             $data['metadata']['sku'],
             $data['metadata']['id'],
             $data['metadata']['departamento']
-            );
+        );
         $data['metadata'] = json_encode($data);
         $this->insert($data, 'produto', 'sku');
         if (isset($variants)) {
-            foreach($variants as &$variant) {
+            foreach ($variants as &$variant) {
                 $variant['produto_sku'] = $data['sku'];
             }
             $this->insert($variants, 'variant', 'sku');
