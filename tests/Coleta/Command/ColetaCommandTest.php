@@ -20,8 +20,9 @@ class ColetaCommandTest extends TestCase
     private $command;
     
 
-    public function setUp()
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
+        parent::__construct($name, $data, $dataName);
         $application = new Application();
         $this->command = $application->find('coleta');
         $html = <<<HTML
@@ -48,7 +49,7 @@ class ColetaCommandTest extends TestCase
         $lock->acquire();
         $this->assertSame(0, $this->tester->execute([]));
         $lock->release();
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Este comando já está em execução em outro processo.',
             $this->tester->getDisplay()
         );
@@ -59,7 +60,7 @@ class ColetaCommandTest extends TestCase
         $this->tester->execute([
             '--url'  => 'wrong'
         ]);
-        $this->assertContains('URL inválida', $this->tester->getDisplay());
+        $this->assertStringContainsString('URL inválida', $this->tester->getDisplay());
     }
 
     public function testWithoutStores()
@@ -67,7 +68,7 @@ class ColetaCommandTest extends TestCase
         $this->tester->execute([
             '--url'  => 'http://test/'
         ]);
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Necessário informar a forma de coleta de dados que deseja realizar',
             $this->tester->getDisplay()
         );
@@ -89,7 +90,7 @@ class ColetaCommandTest extends TestCase
             '--url'  => 'http://test/',
             '--lojas' => [1000]
         ]);
-        $this->assertContains('Loja inválida', $this->tester->getDisplay());
+        $this->assertStringContainsString('Loja inválida', $this->tester->getDisplay());
     }
 
     public function testWithValidStores()
@@ -108,6 +109,6 @@ class ColetaCommandTest extends TestCase
             '--url'  => 'http://test/',
             '--lojas' => [22]
         ]);
-        $this->assertNotContains('Loja inválida', $this->tester->getDisplay());
+        $this->assertStringNotContainsString('Loja inválida', $this->tester->getDisplay());
     }
 }

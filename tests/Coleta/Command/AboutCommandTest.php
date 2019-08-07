@@ -14,6 +14,6 @@ class AboutCommandTest extends TestCase
             'command'  => $command->getName()
         ]);
         $output = $commandTester->getDisplay();
-        $this->assertContains('para mais informações', $output);
+        $this->assertStringContainsString('para mais informações', $output);
     }
 }

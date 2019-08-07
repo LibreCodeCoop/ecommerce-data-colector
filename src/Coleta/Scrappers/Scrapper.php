@@ -21,7 +21,7 @@ abstract class Scrapper
      */
     public function getClient()
     {
-        if (!$this->client) {
+        if (empty($this->client)) {
             $this->client = new HttpBrowser(HttpClient::create([
                 'headers' => [
                     'Host' => parse_url($this->url)['host']

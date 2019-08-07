@@ -63,7 +63,7 @@ class Produto extends Scrapper
         if (!$href->count()) {
             return 0;
         }
-        $href = $href->attr('href');
+        $href = (string) $href->attr('href');
         return $this->lastPage = (int) substr($href, strrpos($href, '/')+1);
     }
 
@@ -74,13 +74,13 @@ class Produto extends Scrapper
             $product['id'] = $node->attr('data-productid');
             $product['sku'] = $node->filterXPath('//*[@data-sku]')->attr('data-sku');
             $img = $node->filterXPath('//*/img[@data-src]');
-            $product['img'] = $img->attr('data-src');
-            $product['img'] = substr($product['img'], 0, strpos($product['img'], '?'));
-            $product['name'] = trim($img->attr('alt'));
+            $product['img'] = (string) $img->attr('data-src');
+            $product['img'] = strtok($product['img'], '?');
+            $product['name'] = trim((string) $img->attr('alt'));
             $href = $node->filter('.collection-product-price a');
             $product['href'] = $href->attr('href');
             $product['price'] = $this->textToFloat($href->text());
-            $href = $node->filter('.collection-product-buy-bt')->attr('href');
+            $href = (string) $node->filter('.collection-product-buy-bt')->attr('href');
             preg_match("/ '(?<codigo>\d+)',(?<spy>true|false)/", $href, $matches);
             if (isset($matches['spy']) && $matches['spy'] == 'true') {
                 $product['spy'] = true;
@@ -136,7 +136,7 @@ class Produto extends Scrapper
     }
     public static function getCodigoFromUrl(string $url):string
     {
-        $path = explode('/', parse_url($url, PHP_URL_PATH));
+        $path = explode('/', (string) parse_url($url, PHP_URL_PATH));
         return $path[2];
     }
     public function getProdutoFromMobile(string $url, $departamento)
@@ -149,7 +149,7 @@ class Produto extends Scrapper
         $name = $crawler->filter('.product-name');
         $product['codigo'] = (int) $name->attr('data-code');
         $product['id'] = (int) $name->attr('data-id');
-        $product['titulo'] = $crawler->filter('meta[property="og:title"]')->attr('content');
+        $product['titulo'] = (string) $crawler->filter('meta[property="og:title"]')->attr('content');
         $product['marca'] = trim(substr(
             $product['titulo'],
             strrpos($product['titulo'], ' - ') + 3,
@@ -191,7 +191,7 @@ class Produto extends Scrapper
     {
         $promos = $crawler->filter('.product-promo')->each(function (Crawler $node) {
             $return = [];
-            $return['type'] = $node->attr('class');
+            $return['type'] = (string) $node->attr('class');
             $return['type'] = trim(str_replace('product-promo', '', $return['type']), ' -');
             $return['text'] = $node->text();
             return $return;
@@ -210,9 +210,10 @@ class Produto extends Scrapper
             $return['comprar'] = $a->text() == 'Comprar'?1:0;
             $return['title'] = trim($node->filter('.product-variant-title')->text());
             $return['title'] = str_replace(' ' . $return['sku'], '', $return['title']);
-            $return['price'] = $node->filter('[data-Price]')->attr('data-price');
+            $return['price'] = (string) $node->filter('[data-Price]')->attr('data-price');
             $return['price'] = $this->textToFloat($return['price']);
-            $return['image'] = strtok($node->filter('[data-variantImage]')->attr('data-variantimage'), '?');
+            $return['image'] = (string) $node->filter('[data-variantImage]')->attr('data-variantimage');
+            $return['image'] = strtok($return['image'], '?');
             if ($return['comprar']) {
                 $return['stock'] = $this->getStock($return['codigo']);
             } else {
@@ -244,7 +245,7 @@ class Produto extends Scrapper
         });
         foreach ($metadata as $data) {
             $text = $crawler->filter('div[data-description-content='.$data['id'].']')->html();
-            $text = preg_replace('!\s+!', ' ', $text);
+            $text = (string) preg_replace('!\s+!', ' ', $text);
             $product['descriptions'][$this->Slugify->slugify($data['name'], '_')] = trim($text);
         }
     }
