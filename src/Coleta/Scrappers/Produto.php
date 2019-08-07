@@ -275,7 +275,7 @@ class Produto extends Scrapper
             $data['metadata']['id'],
             $data['metadata']['departamento']
         );
-        $data['metadata'] = json_encode($data);
+        $data['metadata'] = json_encode($data['metadata']);
         $this->insert($data, 'produto', 'sku');
         if (isset($variants)) {
             foreach ($variants as &$variant) {
