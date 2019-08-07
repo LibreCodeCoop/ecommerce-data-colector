@@ -37,7 +37,7 @@ class DepartamentosTest extends TestCase
             ->getMock();
         $mock->setDb($mockPdo);
         $mock->client = new HttpBrowser(new MockHttpClient([
-            new MockResponse($html, ['response_headers' => ['Set-cookie' => 1]]),// setUp   getCookies
+            new MockResponse('', ['response_headers' => ['Set-cookie' => 1]]),// setUp   getCookies
             new MockResponse(file_get_contents($path . 'sitemap.xml')),
             new MockResponse(file_get_contents($path . 'departamento.xml')), //processSitemap
             new MockResponse(file_get_contents($path . 'produto-extra-fields.html')), //getProdutoFromMobile
