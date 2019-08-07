@@ -3,12 +3,11 @@ language: php
 php:
   - 7.3
 
-before_install:
+before_script:
   - composer self-update
-  - composer install --prefer-source --no-interaction --dev
-
-install:
+  - pecl install ast
   - travis_retry composer update --no-interaction --no-ansi --no-progress --no-suggest --optimize-autoloader
+  - composer install --prefer-source --no-interaction --dev
 
 script:
   - composer test
