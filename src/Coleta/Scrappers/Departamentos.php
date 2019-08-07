@@ -42,6 +42,7 @@ class Departamentos extends Scrapper
         if (!$this->departamentos) {
             $this->produto->client = $this->getClient();
             $this->produto->score->client = $this->getClient();
+            $this->setUp();
             $crawler = $this->getClient()->request('GET', $this->url . '/sitemap.xml');
             $this->departamentos = $crawler->filter('loc')->reduce(function ($node) {
                 return strpos($node->text(), 'depto');
