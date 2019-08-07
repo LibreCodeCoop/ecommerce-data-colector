@@ -18,12 +18,14 @@ class Departamentos extends Scrapper
      */
     private $sitemapUrl;
     use DbTrait;
-    public function __construct(string $url, $db)
+    public function __construct(string $url)
     {
         $this->url = $url;
-        $this->produto = new Produto($this->url);
-        $this->setDb($db);
-        $this->produto->setDb($db);
+        $this->setProduto(new Produto($this->url));
+    }
+    public function setProduto(Produto $produto)
+    {
+        $this->produto = $produto;
     }
     public function processSitemapIndex()
     {
@@ -83,14 +85,14 @@ class Departamentos extends Scrapper
                     } catch (\Exception $e) {
                         $produto['error'] = $e->getMessage();
                     }
-                    $this->setProduto($departamento['codigo'], $produto);
+                    $this->addProduto($departamento['codigo'], $produto);
                     break;
             }
         }
         $this->setScore($departamento['codigo']);
         return $this->departamentos[$departamento['codigo']];
     }
-    private function setProduto(int $codigo, array $produto)
+    private function addProduto(int $codigo, array $produto)
     {
         $this->produto->save($produto);
         $this->departamentos[$codigo]['produtos'][$produto['codigo']] = $produto;

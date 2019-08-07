@@ -32,10 +32,6 @@ class ColetaCommand extends Command
      * @var string
      */
     public $url;
-    /**
-     * @var \PDO
-     */
-    private $pdo;
     protected function configure()
     {
         $this
@@ -54,12 +50,6 @@ class ColetaCommand extends Command
                 HELP
             )
         ;
-        $this->pdo = new \PDO(
-            'pgsql:host='.getenv('DB_HOST').';'.
-                'dbname='.getenv('DB_NAME').';'.
-                'user='.getenv('DB_USER').';'.
-                'password='.getenv('DB_PASSWD')
-        );
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -109,7 +99,7 @@ class ColetaCommand extends Command
     }
     private function getDepartamentos(array $departamentos)
     {
-        $lista = new Departamentos($this->url, $this->pdo);
+        $lista = new Departamentos($this->url);
         $lista->setDepartamentos(array_intersect_key($lista->getDepartmentSitemapFromSitemapIndex(), array_flip($departamentos)));
         $departments = $lista->getDepartmentSitemapFromSitemapIndex();
         $progressBar = new ProgressBar($this->output, count($departments));

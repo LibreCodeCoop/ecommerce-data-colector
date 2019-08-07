@@ -7,16 +7,28 @@ trait DbTrait
      * @var \PDO
      */
     private $pdo;
+    private function getPdo()
+    {
+        if (!$this->pdo) {
+            $this->pdo = new \PDO(
+                'pgsql:host=f'.getenv('DB_HOST').';'.
+                'dbname='.getenv('DB_NAME').';'.
+                'user='.getenv('DB_USER').';'.
+                'password='.getenv('DB_PASSWD')
+            );
+        }
+        return $this->pdo;
+    }
     public function setDb(\PDO $db)
     {
         $this->pdo = $db;
     }
     public function insert($data, $table, $pk)
     {
-        $this->pdo->beginTransaction();
+        $this->getPdo()->beginTransaction();
         if (is_numeric(key($data))) {
             $in  = implode(',', array_fill(0, count($data), '?'));
-            $sth = $this->pdo->prepare(
+            $sth = $this->getPdo()->prepare(
                 'SELECT '.$pk.' FROM '.$table.' WHERE '.$pk.' IN('.$in.')'
             );
             $sth->execute(array_keys($data));
@@ -25,13 +37,13 @@ trait DbTrait
                 return !in_array($row[$pk], $exist);
             });
         } elseif (isset($data[$pk])) {
-            $sth = $this->pdo->prepare(
+            $sth = $this->getPdo()->prepare(
                 'SELECT '.$pk.' FROM '.$table.' WHERE '.$pk.' = ?'
             );
             $sth->execute([$data[$pk]]);
             $exist = $sth->fetchAll(\PDO::FETCH_COLUMN, 0);
             if ($exist) {
-                $this->pdo->rollBack();
+                $this->getPdo()->rollBack();
                 return;
             }
             $toInsert = $data;
@@ -62,10 +74,10 @@ trait DbTrait
                 'INSERT INTO '.$table.' ('.implode(',', $columns).')'.
                 ' VALUES ' .
                 $sqlValues;
-            $sth = $this->pdo->prepare($insert);
+                $sth = $this->getPdo()->prepare($insert);
             $sth->execute($values);
         }
-        $this->pdo->commit();
+        $this->getPdo()->commit();
     }
     public function update($table, $set, $where, $data)
     {
@@ -73,7 +85,7 @@ trait DbTrait
             'UPDATE ' . $table . ' ' .
             'SET ' . implode(',', $set) . ' ' .
             'WHERE ' . implode(',', $where);
-        $sth = $this->pdo->prepare($update);
+        $sth = $this->getPdo()->prepare($update);
         $sth->execute($data);
     }
 }
