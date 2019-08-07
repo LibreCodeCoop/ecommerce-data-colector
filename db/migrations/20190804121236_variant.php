@@ -17,6 +17,7 @@ class Variant extends AbstractMigration
             ->addColumn('stock', 'integer')
             ->addColumn('image', 'string', ['limit' => 255])
             ->addColumn('price', Literal::from('NUMERIC(10, 2)'))
+            ->addColumn('created', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->AddIndex(['sku'], ['unique' => true])
             ->addForeignKey('produto_sku', 'produto', 'sku', ['delete'=> 'CASCADE', 'update'=> 'CASCADE'])
             ->create();
