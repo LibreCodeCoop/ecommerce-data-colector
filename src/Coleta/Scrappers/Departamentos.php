@@ -85,7 +85,9 @@ class Departamentos extends Scrapper
                     } catch (\Exception $e) {
                         $produto['error'] = $e->getMessage();
                     }
-                    $this->addProduto($departamento['codigo'], $produto);
+                    if ($produto) {
+                        $this->addProduto($departamento['codigo'], $produto);
+                    }
                     break;
             }
         }
@@ -99,6 +101,9 @@ class Departamentos extends Scrapper
     }
     public function setScore(int $codigoDepartamento)
     {
+        if (!isset($this->departamentos[$codigoDepartamento]['produtos'])) {
+            return;
+        }
         $idProducts = array_keys($this->departamentos[$codigoDepartamento]['produtos']);
         $scores = $this->produto->score->scores($idProducts);
         if ($scores) {

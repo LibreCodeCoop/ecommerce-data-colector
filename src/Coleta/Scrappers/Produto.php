@@ -71,7 +71,7 @@ class Produto extends Scrapper
     {
         $this->products = $crawler->filter('.collection.dept-collection.loadProducts li')->each(function (Crawler $node) {
             $product = [];
-            $product['id'] = $node->attr('data-productid');
+            $product['idfff'] = $node->attr('data-productid');
             $product['sku'] = $node->filterXPath('//*[@data-sku]')->attr('data-sku');
             $img = $node->filterXPath('//*/img[@data-src]');
             $product['img'] = (string) $img->attr('data-src');
@@ -142,10 +142,27 @@ class Produto extends Scrapper
     public function getProdutoFromMobile(string $url, $departamento)
     {
         $product = [];
+        $product['sku'] = $this->getCodigoFromUrl($url);
+        $exist = $this->execute(
+            "SELECT p.*,
+                    sp.sitemap_codigo
+               FROM produto p
+               LEFT JOIN sitemap_produto sp ON sp.produto_sku = p.sku AND sp.sitemap_codigo = ?
+              WHERE sku = ?",
+            [$departamento, $product['sku']]
+        );
+        if ($exist) {
+            if (!$exist[0]['sitemap_codigo']) {
+                $this->insert([
+                    'produto_sku' => $product['sku'],
+                    'sitemap_codigo' => $departamento
+                ], 'sitemap_produto');
+            }
+            return;
+        }
         $crawler = $this->getClient()->request('GET', $url);
         $this->score->getStoreKey($crawler);
         $product['url'] = $url;
-        $product['sku'] = $this->getCodigoFromUrl($url);
         $name = $crawler->filter('.product-name');
         $product['codigo'] = (int) $name->attr('data-code');
         $product['id'] = (int) $name->attr('data-id');
@@ -205,7 +222,12 @@ class Produto extends Scrapper
         $variants = $crawler->filter('.product-variants-scroll tr')->each(function (Crawler $node) {
             $return = [];
             $a = $node->filter('[data-sku]');
-            $return['sku'] = $a->attr('data-sku');
+            if (!$a->count()) {
+                $a = $node->filter('[data-sku-product]');
+                $return['sku'] = $a->attr('data-sku-product');
+            } else {
+                $return['sku'] = $a->attr('data-sku');
+            }
             $return['codigo'] = (int) $a->attr('data-variantid');
             $return['comprar'] = $a->text() == 'Comprar'?1:0;
             $return['title'] = trim($node->filter('.product-variant-title')->text());
@@ -256,8 +278,13 @@ class Produto extends Scrapper
             $variants = $data['variants'];
             unset($data['variants']);
         }
+        $sitemap_produto = [
+            'produto_sku' => $data['sku'],
+            'sitemap_codigo' => $data['departamento']
+        ];
         $data['metadata'] = $data;
         unset(
+            $data['departamento'],
             $data['imagens'],
             $data['descriptions'],
             $data['split_price_quantity'],
@@ -265,6 +292,7 @@ class Produto extends Scrapper
             $data['original_price'],
             $data['discount'],
             $data['price'],
+            $data['best_price'],
             $data['stock'],
             $data['promos'],
             $data['descricao_curta'],
@@ -278,6 +306,7 @@ class Produto extends Scrapper
         );
         $data['metadata'] = json_encode($data['metadata']);
         $this->insert($data, 'produto', 'sku');
+        $this->insert($sitemap_produto, 'sitemap_produto');
         if (isset($variants)) {
             foreach ($variants as &$variant) {
                 $variant['produto_sku'] = $data['sku'];

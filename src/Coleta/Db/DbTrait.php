@@ -23,10 +23,17 @@ trait DbTrait
     {
         $this->pdo = $db;
     }
-    public function insert($data, $table, $pk)
+    public function execute($query, $data = [])
+    {
+        $sth = $this->getPdo()->prepare($query);
+        if ($sth->execute($data)) {
+            return $sth->fetchAll(\PDO::FETCH_ASSOC);
+        }
+    }
+    public function insert($data, $table, $pk = null)
     {
         $this->getPdo()->beginTransaction();
-        if (is_numeric(key($data))) {
+        if ($pk && is_numeric(key($data))) {
             $in  = implode(',', array_fill(0, count($data), '?'));
             $sth = $this->getPdo()->prepare(
                 'SELECT '.$pk.' FROM '.$table.' WHERE '.$pk.' IN('.$in.')'
@@ -36,7 +43,7 @@ trait DbTrait
             $toInsert = array_filter($data, function ($row) use ($exist, $pk) {
                 return !in_array($row[$pk], $exist);
             });
-        } elseif (isset($data[$pk])) {
+        } elseif ($pk && isset($data[$pk])) {
             $sth = $this->getPdo()->prepare(
                 'SELECT '.$pk.' FROM '.$table.' WHERE '.$pk.' = ?'
             );

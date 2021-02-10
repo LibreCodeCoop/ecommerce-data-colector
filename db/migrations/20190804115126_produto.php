@@ -14,11 +14,9 @@ class Produto extends AbstractMigration
             ->addColumn('codigo', 'integer')
             ->addColumn('sku', 'string', ['length' => 30])
             ->addColumn('id', 'integer')
-            ->addColumn('departamento', 'integer')
             ->addColumn('metadata', 'json')
             ->addColumn('created', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->AddIndex(['sku'], ['unique' => true])
-            ->addForeignKey('departamento', 'sitemap', 'codigo', ['delete'=> 'NO_ACTION', 'update'=> 'NO_ACTION'])
             ->create();
     }
 }
