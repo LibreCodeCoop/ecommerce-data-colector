@@ -46,7 +46,7 @@ class ColetaCommand extends Command
                 O comando <info>coleta</info> realiza a coletat de dados.
 
                 Maiores informações:
-                    https://github.com/LyseonTech/ecommerce-data-colector
+                    https://github.com/librecodecoop/ecommerce-data-colector
                 HELP
             )
         ;
