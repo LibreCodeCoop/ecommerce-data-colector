@@ -1,5 +1,5 @@
 {
-	"name" : "lyseontech/coleta-dados-ecommerce",
+	"name" : "librecodecoop/coleta-dados-ecommerce",
 	"description" : "Coleta de dados em site de e-commerce",
 	"license" : "MIT",
 	"type" : "cli-app",
