@@ -25,7 +25,7 @@ class AboutCommand extends Command
         $output->write(<<<HELP
             <info>Coleta dados em site de e-commerce</info>
             <comment>Coleta de dados de site de e-commerce.</comment>
-            Veja https://github.com/LyseonTech/ecommerce-data-colector/ para mais informações.
+            Veja https://github.com/librecodecoop/ecommerce-data-colector/ para mais informações.
 
             HELP
         );
