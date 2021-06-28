@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/LyseonTech/ecommerce-data-colector.svg?branch=master)](https://travis-ci.org/LyseonTech/ecommerce-data-colector)
-[![Coverage Status](https://coveralls.io/repos/github/LyseonTech/ecommerce-data-colector/badge.svg?branch=master)](https://coveralls.io/github/LyseonTech/ecommerce-data-colector?branch=master)
+[![Build Status](https://travis-ci.org/LibreCodeCoop/ecommerce-data-colector.svg?branch=master)](https://travis-ci.org/LibreCodeCoop/ecommerce-data-colector)
+[![Coverage Status](https://coveralls.io/repos/github/LibreCodeCoop/ecommerce-data-colector/badge.svg?branch=master)](https://coveralls.io/github/LibreCodeCoop/ecommerce-data-colector?branch=master)
 [![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
 [![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.3-blue.svg)](https://php.net/)
 
@@ -12,7 +12,7 @@ Coleta de de dados em site de e-commerce
 A execução do projeto com Docker é bem simples:
 
 ```bash
-git clone https://github.com/lyseontech/ecommerce-data-colector coleta-dados
+git clone https://github.com/librecodecoop/ecommerce-data-colector coleta-dados
 cd coleta-dados
 cp .env.develop .env
 docker-compose up -d
